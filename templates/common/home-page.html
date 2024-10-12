@@ -13,13 +13,10 @@
             </button>
         </form>
         <!-- End Searchbar Form -->
-
-        <!-- Start Pet Photos Post Section -->
-        <!-- Start First Pet Photo Post -->
+    
+        {% for photo in all_photos %}
             {% include 'common/pet-posts.html' %}
-        <!-- End Third Pet Photo Post -->
-        <!-- End Pet Photos Post Section -->
-        
+        {% endfor %}
 
     </div>
 </div>

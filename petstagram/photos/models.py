@@ -12,7 +12,7 @@ class Photo(models.Model):
         validators=[
             FileSizeValidator(5),
         ],
-    ) # To work with an image field, we should install a library called Pillow: pip install Pillow
+    )  # To work with an image field, we should install a library called Pillow: pip install Pillow
     description = models.TextField(
         max_length=300,
         validators=[

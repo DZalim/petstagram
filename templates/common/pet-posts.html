@@ -1,7 +1,5 @@
 {% load static %}
 
-<!-- Start Pet Photos Post Section -->
-<!-- Start First Pet Photo Post -->
 <div class="card">
 
     <!-- Start User Details and Image Location -->
@@ -26,16 +24,39 @@
                     <!-- show user username -->
                 </a>
                 <br>
-                <!-- if the photo has location -->
-                <span>Bansko, Bulgaria</span>
+            
+                {% if photo.location %}
+                    <span>{{ photo.location }}</span>
+                {% endif %}
+                
+            {% if photo_page %}
+            <!-- IF the viewer is the creator of the photo -->
+                <div class="edit-delete-btns">
+    
+                    <!-- Link to Edit Pet Photo Page -->
+                    <a href="{% url 'photo-edit' photo.pk %}">
+                        <img class="edit-img" src="{% static '/images/edit-pen-icon-6.jpg' %}"
+                             alt="edit button">
+                    </a>
+    
+                    <!-- Link to Delete Pet Photo Page -->
+                    <a href="#">
+                        <img class="bin-img" src="{% static '/images/icon-remove-22.jpg' %}"
+                             alt="bin button">
+                    </a>
+                </div>
+            <!-- End IF the viewer is the creator of the photo -->
+            {% endif %}
+            
             </h3>
         </div>
     </div>
     <!-- End User Details and Image Location -->
 
     <!-- Start Pet Photo -->
-    <div class="imgBx" id="place the id of the photo here">
-        <img src="{% static 'images/axolotl.jpeg' %}" alt="post" class="cover">
+    <div class="imgBx" id={{ photo.id }}> 
+        <!-- id=photo.id helps to redirect(request.META['HTTP_REFERER'] + f'#{photo_id}')-->
+        <img src="{{ photo.photo.url }}" alt="post" class="cover">
     </div>
     <!-- End Pet Photo -->
 
@@ -45,17 +66,20 @@
             <div class="left">
                 <!-- Start Like Button -->
                 <span class="heart">
-                    <a href="#">
-                        <!-- if user has liked the photo -->
-                        <i class="fa-solid fa-heart" style="color: #ed4040;"></i>
-                        <!-- else -->
-                        <i class="fa-regular fa-heart"></i>
+                    <a href="{% url 'like' photo.id %}">
+                    
+                        {% if photo.like_set.all %}
+                            <i class="fa-solid fa-heart" style="color: #ed4040;"></i>
+                        {% else %}
+                            <i class="fa-regular fa-heart"></i>
+                        {% endif %}
+                    
                     </a>
                 </span>
                 <!-- End Like Button -->
 
                 <!-- Start Share Button -->
-                <a href="#">
+                <a href="{% url 'share' photo.id %}">
                     <i class="fa-solid fa-share"></i>
                 </a>
                 <!-- End Share Button -->
@@ -65,33 +89,61 @@
         <!-- End Like and Share Buttons -->
 
         <!-- Number of Likes per Photo -->
-        <p class="likes">203 likes</p>
+        <p class="likes">{{ photo.like_set.count }} likes</p>
 
 
-        <!-- Start Tagged Pets -->
-        <!-- Link to First Tagged Pet Details Page-->
-        <a href="#">
+        {% for pet in photo.tagged_pets.all %}
+        <a href="{% url 'pet-details' "username" pet.slug %}">
             <p class="message">
-                <b>Sasho</b>
+                <b>{{ pet.name }}/b>
             </p>
         </a>
+        {% endfor %}
 
-        <!-- Link to Second Tagged Pet Details Page-->
-        <a href="#">
-            <p class="message">
-                <b>Some other fish</b>
-            </p>
-        </a>
-        <!-- End Tagged Pets -->
 
-        <!-- Link to Photo Details Page -->
-        <a href="#">
-            <h4 class="details">See details</h4>
-        </a>
+        {% if photo_page %}
+            <p class="pet-details">{{ photo.description }}</p>
+        {% else %}
+            <a href="{% url 'photo-details' photo.pk %}">
+                <h4 class="details">See details</h4>
+            </a>
+        {% endif %}
+        
+        
+    
+        <h5 class="postTime">{{ photo.date_of_publication}}</h5>
 
-        <!-- Date of Publication -->
-        <h5 class="postTime">19/09/2022</h5>
 
+        {% if photo_page %}
+        {% for comment in comments %}
+            <div class="comments">
+                <div class="top">
+                    <div class="userDetails">
+                        <div class="comment-data">
+                            <div class="profilepic">
+                                <div class="profile_img">
+                                    <div class="image">
+                                        <!-- User Profile Image -->
+                                        <img src="{% static 'images/person.png' %}" alt="img8">
+                                    </div>
+                                </div>
+                            </div>
+                            <p>
+                                <!-- Link to User Profile Details Page-->
+                                <!-- User First and/or Last Name or username-->
+                                <a href="">Steven Ivanov</a>
+                                <!-- User Comment -->
+                                {{ comment.text }}
+                            </p>
+                        </div>
+                        <span>{{ comment.date_time_of_publication }}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- End Comments Section -->
+        {% endfor %}
+        {% endif %}
+    
         <!-- Start Add Comments Section -->
         <div class="addComments">
 
@@ -109,12 +161,3 @@
 
     </div>
 </div>
-<!-- End First Pet Photo Post -->
-
-<!-- Start Second Pet Photo Post -->
-<!-- End Second Pet Photo Post -->
-
-<!-- Start Third Pet Photo Post -->
-<!-- End Third Pet Photo Post -->
-
-<!-- End Pet Photos Post Section -->
