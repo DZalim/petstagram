@@ -1,6 +1,8 @@
 {% extends 'common/base.html' %}
 
 {% block content %}
+{% load static %}
+    
 <!-- Start Profile Details Section -->
 <div class="profile">
 <!-- Start Profile Personal Data Section -->
@@ -18,7 +20,7 @@
 
       <!-- IF the viewer is the owner of the profile -->
       <!-- Link to Edit Profile Page -->
-      <a href="{% url 'profile-edit' pk %}">
+      <a href="{% url 'profile-edit' 1 %}">
         <img
           class="edit-img"
           src="{% static 'images/edit-pen-icon-6.jpg' %}"
@@ -27,7 +29,7 @@
       </a>
 
       <!-- Link to Delete Profile Page -->
-      <a href="{% url 'profile-delete' pk %}">
+      <a href="{% url 'profile-delete' 1 %}">
         <img
           class="bin-img"
           src="{% static 'images/icon-remove-22.jpg' %}"
@@ -66,7 +68,7 @@
   <div class="statuses">
     <!-- Start 1st Pet Details Page -->
     <!-- Link to First Pet Details Page -->
-    <a href="{% url 'pet-details' pk %}">
+    <a href="{% url 'pet-details' "username" "pet_slug" %}">
       <div class="head-pet">
         <div class="status">
           <div class="image">
@@ -85,7 +87,7 @@
 
     <!-- Start 2nd Pet Details Page -->
     <!-- Link to Second Pet Details Page -->
-    <a href="{% url 'pet-details' pk %}">
+    <a href="{% url 'pet-details' "username" "pet_slug" %}">
       <div class="head-pet">
         <div class="status">
           <div class="image">
@@ -104,7 +106,7 @@
 
     <!-- Start 3rd Pet Details Page -->
     <!-- Link to Pet Details Page -->
-    <a href="{% url 'pet-details' pk %}">
+    <a href="{% url 'pet-details' "username" "pet_slug" %}">
       <div class="head-pet">
         <div class="status">
           <div class="image">
@@ -121,7 +123,7 @@
 
     <!-- Start 4th Pet Details Page -->
     <!-- Link to Pet Details Page -->
-    <a href="{% url 'pet-details' pk %}">
+    <a href="{% url 'pet-details' "username" "pet_slug" %}">
       <div class="head-pet">
         <div class="status">
           <div class="image">
@@ -138,7 +140,7 @@
 
     <!-- Start 5th Pet Details Page -->
     <!-- Link to Pet Details Page -->
-    <a href="{% url 'pet-details' pk %}">
+    <a href="{% url 'pet-details' "username" "pet_slug" %}">
       <div class="head-pet">
         <div class="status">
           <div class="image">
@@ -155,7 +157,7 @@
 
     <!-- Start 6th Pet Details Page -->
     <!-- Link to Pet Details Page -->
-    <a href="{% url 'pet-details' pk %}">
+    <a href="{% url 'pet-details' "username" "pet_slug" %}">
       <div class="head-pet">
         <div class="status">
           <div class="image">
@@ -172,7 +174,7 @@
 
     <!-- Start 7th Pet Details Page -->
     <!-- Link to Pet Details Page -->
-    <a href="{% url 'pet-details' pk %}">
+    <a href="{% url 'pet-details' "username" "pet_slug" %}">
       <div class="head-pet">
         <div class="status">
           <div class="image">
