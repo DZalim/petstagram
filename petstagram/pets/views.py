@@ -1,3 +1,5 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 
@@ -6,15 +8,28 @@ from petstagram.pets.forms import PetAddForm, PetEditForm, PetDeleteForm
 from petstagram.pets.models import Pet
 
 
-class AddPetView(CreateView):
+class AddPetView(LoginRequiredMixin, CreateView):
     model = Pet
     # queryset = Pet.objects.all() #This can also be submitted instead of model=Pet. Either one or the other. Not both for the base model
     form_class = PetAddForm
     template_name = 'pets/pet-add-page.html'
-    success_url = reverse_lazy('profile-details', kwargs={'pk': 1})  # pk=1 it will change after we create an account
+
+    def form_valid(self, form):
+        pet = form.save(commit=False)
+        pet.user = self.request.user
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'profile-details',
+            kwargs={
+                'pk': self.request.user.pk
+            }
+        )
 
 
-class PetDetailsView(DetailView):  # DetailView cannot work with Forms. Does not inherit Form!!
+class PetDetailsView(LoginRequiredMixin, DetailView):  # DetailView cannot work with Forms. Does not inherit Form!!
     model = Pet
     template_name = 'pets/pet-details-page.html'
     slug_url_kwarg = 'pet_slug'  # <slug:pet_slug>
@@ -25,10 +40,17 @@ class PetDetailsView(DetailView):  # DetailView cannot work with Forms. Does not
         context[
             "comment_form"] = CommentForm()  # This is for preview only. How it works - comment_functionality in common app
 
+        all_photos = context["pet"].photo_set.all()
+
+        for photo in all_photos:
+            photo.has_liked = photo.like_set.filter(user=self.request.user).exists()
+
+        context["all_photos"] = all_photos
+
         return context
 
 
-class PetEditView(UpdateView):
+class PetEditView(LoginRequiredMixin, UpdateView):
     model = Pet
     form_class = PetEditForm
     template_name = 'pets/pet-edit-page.html'
@@ -43,13 +65,24 @@ class PetEditView(UpdateView):
             }
         )
 
+    def test_func(self): # Forbiiden to access of other user
+        pet = get_object_or_404(Pet, slug=self.kwargs["pet_slug"])
+        return self.request.user == pet.user
 
-class PetDeleteView(DeleteView):
+
+class PetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Pet
     template_name = 'pets/pet-delete-page.html'
     form_class = PetDeleteForm
     slug_url_kwarg = 'pet_slug'
-    success_url = reverse_lazy('profile-details', kwargs={'pk': 1})
+
+
+    def get_success_url(self):
+        return reverse_lazy('profile-details', kwargs={'pk': self.request.user.pk})
+
+    def test_func(self): # Forbiiden to access of other user
+        pet = get_object_or_404(Pet, slug=self.kwargs["pet_slug"])
+        return self.request.user == pet.user
 
     def get_initial(self):  # Just populates the data. But the data is not submitted to the delete form
         return self.get_object().__dict__

@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, resolve_url
 from django.views.generic import ListView
@@ -18,8 +19,13 @@ class HomeView(ListView):  # ListView does not inherit Form
         context = super().get_context_data(**kwargs)
 
         context['comment_form'] = CommentForm()
-        context['search_form'] = SearchForm(self.request.GET)  # self.request.GET so that what is written in the search engine remains and does not disappear
+        context['search_form'] = SearchForm(
+            self.request.GET)  # self.request.GET so that what is written in the search engine remains and does not disappear
         context['all_photos'] = context['page_obj']  # paginator paje obg
+
+        user= self.request.user
+        for photo in context["all_photos"]:
+            photo.has_liked = photo.like_set.filter(user=user).exists() if user.is_authenticated else False
 
         return context
 
@@ -35,13 +41,14 @@ class HomeView(ListView):  # ListView does not inherit Form
         return queryset
 
 
+@login_required
 def like_functionality(request, photo_id):
-    liked_object = Like.objects.filter(to_photo_id=photo_id).first()
+    liked_object = Like.objects.filter(to_photo_id=photo_id, user=request.user).first()
 
     if liked_object:
         liked_object.delete()
     else:
-        like = Like(to_photo_id=photo_id)
+        like = Like(to_photo_id=photo_id, user=request.user)
         like.save()
 
     # redirect to the last visited page (request.META['HTTP_REFERER']) and will stop exactly at the photo we liked/unliked (f'#{photo_id}')
@@ -56,6 +63,7 @@ def share_functionality(request, photo_id):  # copy_link_to_clipboard
     return redirect(request.META['HTTP_REFERER'] + f'#{photo_id}')
 
 
+@login_required
 def comment_functionality(request, photo_id: int):
     if request.POST:
         photo = Photo.objects.get(pk=photo_id)
@@ -64,6 +72,7 @@ def comment_functionality(request, photo_id: int):
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)  # to add a relation in the following rows
             comment.to_photo = photo
+            comment.user = request.user
             comment.save()
 
         return redirect(request.META['HTTP_REFERER'] + f'#{photo_id}')
