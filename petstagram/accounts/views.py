@@ -1,8 +1,9 @@
 from django.shortcuts import render
 
+
 # Create your views here.
 def register(request):
-     return render(request, 'accounts/register-page.html')
+    return render(request, 'accounts/register-page.html')
 
 
 def login(request):
@@ -11,7 +12,6 @@ def login(request):
 
 def show_profile_details(request, pk):
     return render(request, 'accounts/profile-details-page.html')
-
 
 
 def edit_profile(request, pk):
